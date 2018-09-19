@@ -1,20 +1,3 @@
-'''
-from cmath import exp, pi
-
-
-def fft(x):
-    N = len(x)
-    if N <= 1: return x
-    even = fft(x[0::2])
-    odd = fft(x[1::2])
-    T = [exp(-2j * pi * k / N) * odd[k] for k in xrange(N / 2)]
-    return [even[k] + T[k] for k in xrange(N / 2)] + \
-           [even[k] - T[k] for k in xrange(N / 2)]
-
-
-print(' '.join("%5.3f" % abs(f)
-               for f in fft([1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0])))
-'''
 
 from matplotlib.figure import Figure
 from Tkinter import *
@@ -29,9 +12,6 @@ import matplotlib
 
 global filename, Signal1
 from tkFileDialog import askopenfilename
-# matplotlib.use('TkAgg')
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# from matplotlib.figure import Figure
 import math
 import cmath
 import copy
@@ -59,13 +39,10 @@ nn1 = []
 def Browes1():
     filename = askopenfilename()
     Signal1 = Signal_Info(filename)
-    # for i in Signal1:
     Xind = [i[0] for i in Signal1]
     Yval = [i[1] for i in Signal1]
     plt.plot(Xind, Yval, 'bo', color='blue', markersize=7)
     plt.show()
-    # maxi = max(Yval)
-    # mini = min(Yval)
     print filename
     return filename
 
@@ -74,7 +51,6 @@ def Signal_Info(File):
     global maxi, mini
     if File:
         with open(File) as f2:
-            # f2 = open(File)
             Signal_Type = f2.readline()
             Is_Periodic = f2.readline()
             Num_Of_Samples = f2.readline()
@@ -164,9 +140,7 @@ def Sub():
     ActualSub()
     plt.xlabel('Time -- sample number')
     plt.ylabel('voltage')
-    # plt.show()
     plt.show()
-    # print FinalRes
     return FinalRes
 
 
@@ -181,7 +155,6 @@ def Mul():
     plt.plot(XX, YY, 'bo', color='blue', markersize=7)
     plt.xlabel('Time -- sample number')
     plt.ylabel('voltage')
-    # plt.show()
     plt.show()
 
 
@@ -196,7 +169,6 @@ def Mul2():
     plt.plot(XX, YY, 'bo', color='blue', markersize=7)
     plt.xlabel('Time -- sample number')
     plt.ylabel('voltage')
-    # plt.show()
     plt.show()
 
 
@@ -208,26 +180,20 @@ def Exit():
 
 
 def Fold():
-    #    def fold():
     Filename = askopenfilename()
     MySignal = Signal_Info(Filename)
-    # for i in Signal1:
     Mylist = []
     X = [i[0] for i in MySignal]
     Yval = [i[1] for i in MySignal]
     for i in reversed(Yval):
         Mylist.append(i)
-        #   print Mylist
-        #  print Yval
 
 
 def Mul_Constant():
     what = var_chk.get()
     if what == 1:
-        # print("This is signal1")
         Mul()
     else:
-        # print("This is signal2")
         Mul2()
 
 
@@ -251,35 +217,19 @@ def convolution():
 def normalize1():
     global Signal1
     V1 = []
-    # v2=[2,5,2,7,2,4,9,2]
-    # a = np.array([2,5,2,7,2,-4,9,2])
-    # maxi = max(Signal1)
-    # mini=min(Signal1)
-    # mini = -1 * max(Signal1)
 
-    # print(maxi)
-    # print(mini)
-    # Y=np.array(Yval)
     what = var_chk2.get()
     for j in Signal1:
         if what == 1:
             V1.append((j[0], (j[1] - mini) / (maxi - mini)))  # V1 = (j[1] - Min) / (Max - Min)
-            # print(V1)
             Xind1 = [i[0] for i in V1]
             Yval2 = [i[1] for i in V1]
-            # print Yval2
             plt.plot(Xind1, Yval2, 'bo', color='red', markersize=7)
-            # plt.show()
         else:
             V1.append((j[0], (
             -1 + (((j[1] - mini) / (maxi - mini)) * 2))))  # V1 = (j[1] - Min) / (Max - Min)  #######V1=1+2*V1
-            # print(V1)
-            # V1 = (((j[1] - Min) / (Max - Min))*2)+1
-            # V1=1+(2*V1)
-            # [3  7  3  9  3  5 11  3]
             Xind2 = [i[0] for i in V1]
             Yval3 = [i[1] for i in V1]
-            # print Yval3
             plt.plot(Xind2, Yval3, 'bo', color='purple', markersize=7)
     print(V1)
     plt.show()
@@ -292,15 +242,10 @@ def Remove_DC_Component():
     x = [i[0] for i in Signal1]
     sum1 = sum(y)
 
-    # Count = range(len(y))
     Count = len(y)
-    # print Count
-    # c1=np.asarray(Count)
     mean = float(sum1 / Count)
     mean1 = np.asarray(mean)
     Rem = y - mean1
-    # print sum1
-    # print mean
     plt.plot(x, Rem, 'bo', color='red', markersize=7)
     plt.show()
     print Rem
@@ -308,7 +253,6 @@ def Remove_DC_Component():
 
 def Sharpen():
     sharp = []
-    # y=float
     y = [i[1] for i in Signal1]
     x = [i[0] for i in Signal1]
     y.insert(0, 0)
@@ -316,8 +260,6 @@ def Sharpen():
     print y
     for i in range(len(y) - 2):
         sharp.append(y[i + 1] - y[i])
-        # for i in Signal1:
-    # yy=[i[1] for i in y]
     plt.plot(x, sharp, 'bo', color='red', markersize=7)
     plt.show()
     print x
@@ -365,7 +307,6 @@ def autocorrelation():
             temp /= len(signal1)
             summation[i] = temp
         np.savetxt('DAutoCorrelation.ds', summation, fmt='%5s')
-        # disp=Tk()
         figure = Figure()
         tempo = figure.add_subplot(211)
         tempo.scatter(x, signal1, color='blue')
@@ -409,7 +350,6 @@ def crosscorrelation():
 
     signal2 = [i[1] for i in Signal3]
     x2 = [i[0] for i in Signal3]
-    # print (signal1 , signal2)
     if (len(signal1) != len(signal2)):
         n = (len(signal1) + len(signal2)) - 1
         for i in range(n - len(signal1)):
@@ -446,7 +386,6 @@ def crosscorrelation():
         sum.append(res)
     np.savetxt('CorrelationResult.ds', sum, fmt='%5s')
     print (sum)
-    # print (sumy)
 
 
 def Get_Values():
@@ -482,7 +421,6 @@ def Generate_signal_Sin():
         y.append(Xn)
     print y
     plt.plot(x, y, 'bo', color='blue', markersize=3)
-    # plt.plot(x, y)
     plt.show()
 
 
@@ -513,31 +451,16 @@ def DFT():
     Xind = [i[0] for i in Signal1]
     Yval = [i[1] for i in Signal1]
 
-    # print Yval
     N = len(Yval)
-    # print N
 
     FmList = FFT(Yval)
-
-    # for k in range(N):
-    #     Fm = 0.0
-    #     for n in range(N):
-    #         Fm += Yval[n] * cmath.exp(- 1j * (pi2 * k * n) / N)
-    #     FmList.append(Fm)
-
-    # print FmList
 
     r = []
     im = []
     for i in range(len(FmList)):
         x = FmList[i]
-        # print x.real
-        # print x.imag
-        # x = abs(FmList[i])
         r.append(x.real)
         im.append(x.imag)
-    # print r
-    # print im
 
     ambl = []
     for i in range(len(FmList)):
@@ -564,17 +487,13 @@ def DFT():
     lalfa = []
     for i in range(N):
         lalfa.append(alfa + (alfa * i))
-    # print  lalfa
 
     plt.figure(1)
-    # plt.subplot(211)
     plt.scatter(lalfa, ambl)
     plt.xlabel('Frequency')
     plt.ylabel('Amplitude')
-    # plt.show()
 
     plt.figure(2)
-    # plt.subplot(212)
     plt.scatter(lalfa, phasel)
     plt.xlabel('Frequency')
     plt.ylabel('Phase shift')
@@ -596,7 +515,6 @@ def IDFT():
     for n in range(len(m2)):
         h = round(math.degrees(m2[n]), 2)
         m22.append(h)
-    # print m22
 
     df = []
     for i in range(len(m1)):
@@ -604,12 +522,6 @@ def IDFT():
         x1.append(r)
         im = m1[i] * math.sin(m2[i])
         y1.append(im)
-        # complex = np.complex(r, im)
-        # df.append(complex)
-    # print df
-    # print fl
-    # print x1
-    # print y1
 
     N = len(x1)
     fnList = []
@@ -618,8 +530,6 @@ def IDFT():
         fy = 0.0
         for m in range(N):
             Pow = (m * pi2 * n) / N
-            # fx += float(x1[m]) * cmath.exp(1j * (pi2 * m * n) / N)
-            # fy += float(y1[m]) * cmath.exp(1j * pi2 * m * n / N)
             fx += float(x1[m]) * float(math.cos(Pow))
             fy += float(y1[m]) * float(math.sin(Pow))
             roun = round((fx - fy) / N, 2)
@@ -818,7 +728,6 @@ button8.place(x=70, y=550)
 button9 = Button(root, text="Convolve", width=15, bg="gray", fg="black", command=convolution)
 button9.pack(side="left", padx=5, pady=5)
 button9.place(x=350, y=550)
-# Fold()
 per_check = IntVar()
 radio5 = Radiobutton(root, text="Periodic", variable=per_check, value=1, fg="black", bg="gray")
 radio5.pack()
