@@ -1,0 +1,830 @@
+'''
+from cmath import exp, pi
+
+
+def fft(x):
+    N = len(x)
+    if N <= 1: return x
+    even = fft(x[0::2])
+    odd = fft(x[1::2])
+    T = [exp(-2j * pi * k / N) * odd[k] for k in xrange(N / 2)]
+    return [even[k] + T[k] for k in xrange(N / 2)] + \
+           [even[k] - T[k] for k in xrange(N / 2)]
+
+
+print(' '.join("%5.3f" % abs(f)
+               for f in fft([1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0])))
+'''
+
+from matplotlib.figure import Figure
+from Tkinter import *
+import matplotlib.pyplot as plt
+import numpy as np
+import tkMessageBox
+from Tkinter import *
+import Tkinter
+from tkFileDialog import askopenfilename
+import tkFileDialog
+import matplotlib
+
+global filename, Signal1
+from tkFileDialog import askopenfilename
+# matplotlib.use('TkAgg')
+# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+# from matplotlib.figure import Figure
+import math
+import cmath
+import copy
+
+pi2 = cmath.pi * 2.0
+
+sum = []
+
+global x1
+x1 = []
+global y1
+y1 = []
+y12 = []
+fl = []
+m1 = []
+m2 = []
+m111 = []
+m0 = []
+mm = []
+nn = []
+nn2 = []
+nn1 = []
+
+
+def Browes1():
+    filename = askopenfilename()
+    Signal1 = Signal_Info(filename)
+    # for i in Signal1:
+    Xind = [i[0] for i in Signal1]
+    Yval = [i[1] for i in Signal1]
+    plt.plot(Xind, Yval, 'bo', color='blue', markersize=7)
+    plt.show()
+    # maxi = max(Yval)
+    # mini = min(Yval)
+    print filename
+    return filename
+
+
+def Signal_Info(File):
+    global maxi, mini
+    if File:
+        with open(File) as f2:
+            # f2 = open(File)
+            Signal_Type = f2.readline()
+            Is_Periodic = f2.readline()
+            Num_Of_Samples = f2.readline()
+            arrfile = []
+
+            for i in f2:
+                line = i.split()
+                X = float(line[0])
+                Val = float(line[1])
+                arrfile.append((X, Val))
+                Yval = [i[1] for i in arrfile]
+                maxi = max(Yval)
+                mini = min(Yval)
+            return arrfile
+
+
+def ActualAdd():
+    for j in Signal1:
+        if j[0] not in Signal2_Index:
+            FinalRes.append((j[0], j[1]))
+    for j in Signal2:
+        if j[0] not in Signal1_Index:
+            FinalRes.append((j[0], j[1]))
+    for i in Signal1:
+        for j in Signal2:
+            if i[0] == j[0]:
+                FinalRes.append((i[0], i[1] + j[1]))
+
+    XX = [i[0] for i in FinalRes]
+    YY = [i[1] for i in FinalRes]
+    plt.plot(XX, YY, 'bo', color='blue', markersize=7)
+    FinalRes.sort()
+    print(FinalRes)
+
+
+def ActualSub():
+    for j in Signal1:
+        if j[0] not in Signal2_Index:
+            FinalRes.append((j[0], j[1]))
+    for j in Signal2:
+        if j[0] not in Signal1_Index:
+            FinalRes.append((j[0], j[1]))
+    for i in Signal1:
+        for j in Signal2:
+            if i[0] == j[0]:
+                FinalRes.append((i[0], j[1] - i[1]))
+    XX = [i[0] for i in FinalRes]
+    YY = [i[1] for i in FinalRes]
+    plt.plot(XX, YY, 'bo', color='blue', markersize=7)
+    print(FinalRes)
+
+
+def Add():
+    global Signal1, Signal2, FinalRes, Signal1_Index, Signal2_Index
+    FinalRes = []
+    from tkFileDialog import askopenfilename
+    AddFile = askopenfilename()
+    Signal2 = Signal_Info(AddFile)
+
+    Signal1_Index = [index[0] for index in Signal1]
+    Signal2_Index = [index[0] for index in Signal2]
+
+    print(Signal1_Index)
+    print(Signal2_Index)
+    Signal1_Index.sort()
+    Signal2_Index.sort()
+    print(Signal1_Index)
+    print(Signal2_Index)
+
+    ActualAdd()
+    plt.xlabel('Time -- sample number')
+    plt.ylabel('voltage')
+    plt.show()
+    return FinalRes
+
+
+def Sub():
+    global Signal1, Signal2, FinalRes, Signal1_Index, Signal2_Index
+    FinalRes = []
+    from tkFileDialog import askopenfilename
+    AddFile = askopenfilename()
+    Signal2 = Signal_Info(AddFile)
+
+    Signal1_Index = [i[0] for i in Signal1]
+    Signal2_Index = [i[0] for i in Signal2]
+    print(Signal1_Index)
+    ActualSub()
+    plt.xlabel('Time -- sample number')
+    plt.ylabel('voltage')
+    # plt.show()
+    plt.show()
+    # print FinalRes
+    return FinalRes
+
+
+def Mul():
+    FinalRes = []
+    Num = int(ent.get())
+    for i in Signal1:
+        FinalRes.append((i[0], i[1] * Num))
+    print FinalRes
+    XX = [i[0] for i in FinalRes]
+    YY = [i[1] for i in FinalRes]
+    plt.plot(XX, YY, 'bo', color='blue', markersize=7)
+    plt.xlabel('Time -- sample number')
+    plt.ylabel('voltage')
+    # plt.show()
+    plt.show()
+
+
+def Mul2():
+    FinalRes = []
+    Num = int(ent.get())
+    for i in Signal2:
+        FinalRes.append((i[0], Num * i[1]))
+    print FinalRes
+    XX = [i[0] for i in FinalRes]
+    YY = [i[1] for i in FinalRes]
+    plt.plot(XX, YY, 'bo', color='blue', markersize=7)
+    plt.xlabel('Time -- sample number')
+    plt.ylabel('voltage')
+    # plt.show()
+    plt.show()
+
+
+def Exit():
+    answer = tkMessageBox.askquestion('Qusetion', 'Are You Sure?')
+    if answer == 'yes':
+        root.destroy()
+        # exit()
+
+
+def Fold():
+    #    def fold():
+    Filename = askopenfilename()
+    MySignal = Signal_Info(Filename)
+    # for i in Signal1:
+    Mylist = []
+    X = [i[0] for i in MySignal]
+    Yval = [i[1] for i in MySignal]
+    for i in reversed(Yval):
+        Mylist.append(i)
+        #   print Mylist
+        #  print Yval
+
+
+def Mul_Constant():
+    what = var_chk.get()
+    if what == 1:
+        # print("This is signal1")
+        Mul()
+    else:
+        # print("This is signal2")
+        Mul2()
+
+
+def convolution():
+    fname2 = askopenfilename()
+
+    Signal1 = Signal_Info(fname2)
+
+    signal1 = [i[1] for i in Signal1]
+    x = [i[0] for i in Signal1]
+    fname3 = askopenfilename()
+
+    Signal3 = Signal_Info(fname3)
+
+    signal2 = [i[1] for i in Signal3]
+    x2 = [i[0] for i in Signal3]
+    Result = np.convolve(signal1, signal2)
+    print (Result)
+
+
+def normalize1():
+    global Signal1
+    V1 = []
+    # v2=[2,5,2,7,2,4,9,2]
+    # a = np.array([2,5,2,7,2,-4,9,2])
+    # maxi = max(Signal1)
+    # mini=min(Signal1)
+    # mini = -1 * max(Signal1)
+
+    # print(maxi)
+    # print(mini)
+    # Y=np.array(Yval)
+    what = var_chk2.get()
+    for j in Signal1:
+        if what == 1:
+            V1.append((j[0], (j[1] - mini) / (maxi - mini)))  # V1 = (j[1] - Min) / (Max - Min)
+            # print(V1)
+            Xind1 = [i[0] for i in V1]
+            Yval2 = [i[1] for i in V1]
+            # print Yval2
+            plt.plot(Xind1, Yval2, 'bo', color='red', markersize=7)
+            # plt.show()
+        else:
+            V1.append((j[0], (
+            -1 + (((j[1] - mini) / (maxi - mini)) * 2))))  # V1 = (j[1] - Min) / (Max - Min)  #######V1=1+2*V1
+            # print(V1)
+            # V1 = (((j[1] - Min) / (Max - Min))*2)+1
+            # V1=1+(2*V1)
+            # [3  7  3  9  3  5 11  3]
+            Xind2 = [i[0] for i in V1]
+            Yval3 = [i[1] for i in V1]
+            # print Yval3
+            plt.plot(Xind2, Yval3, 'bo', color='purple', markersize=7)
+    print(V1)
+    plt.show()
+    return V1  # Mul2()
+
+
+def Remove_DC_Component():
+    Rem = []
+    y = [i[1] for i in Signal1]
+    x = [i[0] for i in Signal1]
+    sum1 = sum(y)
+
+    # Count = range(len(y))
+    Count = len(y)
+    # print Count
+    # c1=np.asarray(Count)
+    mean = float(sum1 / Count)
+    mean1 = np.asarray(mean)
+    Rem = y - mean1
+    # print sum1
+    # print mean
+    plt.plot(x, Rem, 'bo', color='red', markersize=7)
+    plt.show()
+    print Rem
+
+
+def Sharpen():
+    sharp = []
+    # y=float
+    y = [i[1] for i in Signal1]
+    x = [i[0] for i in Signal1]
+    y.insert(0, 0)
+    y.append(0)
+    print y
+    for i in range(len(y) - 2):
+        sharp.append(y[i + 1] - y[i])
+        # for i in Signal1:
+    # yy=[i[1] for i in y]
+    plt.plot(x, sharp, 'bo', color='red', markersize=7)
+    plt.show()
+    print x
+    print sharp
+
+
+def autocorrelation():
+    fname2 = askopenfilename()
+
+    Signal1 = Signal_Info(fname2)
+
+    signal1 = [i[1] for i in Signal1]
+    x = [i[0] for i in Signal1]
+
+    summation = copy.deepcopy(signal1)
+    temp = 0
+    signal2 = copy.deepcopy(signal1)
+    normcheck = norm_check.get()
+    if (normcheck == 1):
+        sumvar1 = 0
+
+        for i in range(len(signal1)):
+            temp = signal1[i] * signal1[i]
+            sumvar1 += temp
+
+        sumvar1 = math.sqrt(sumvar1 * sumvar1)
+        sumvar1 /= len(signal1)
+        for i in range(0, len(signal1)):
+            temp = 0
+            for j in range(0, len(signal1)):
+                temp += signal1[j] * signal2[j]
+            signal2 = np.roll(signal2, -1)
+            temp /= len(signal1)
+            summation[i] = temp / sumvar1
+        np.savetxt('DAutoCorrelationnormalized.ds', summation, fmt='%5s')
+
+
+    else:
+
+        for i in range(0, len(signal1)):
+            temp = 0
+            for j in range(0, len(signal1)):
+                temp += signal1[j] * signal2[j]
+            signal2 = np.roll(signal2, -1)
+            temp /= len(signal1)
+            summation[i] = temp
+        np.savetxt('DAutoCorrelation.ds', summation, fmt='%5s')
+        # disp=Tk()
+        figure = Figure()
+        tempo = figure.add_subplot(211)
+        tempo.scatter(x, signal1, color='blue')
+        tempo = figure.add_subplot(212)
+        tempo.scatter(x, summation, color='green')
+        plt.plot()
+
+
+def Moving_avg1():
+    Mov_avg = []
+    y = [i[1] for i in Signal1]
+    x = [i[0] for i in Signal1]
+    K = int(ent1.get())
+    for i in range((K - 1) / 2):
+        y.insert(0, 0)
+        y.append(0)
+    for i in range(len(y)):
+        if len(y) - i < K:
+            break
+
+        sum = 0
+        for j in range(i, K + i):
+            sum += y[j]
+
+        Mov_avg.append(round((float(sum) / float(K)), 3))
+    plt.plot(x, Mov_avg, 'bo', color='red', markersize=7)
+    plt.show()
+    print x
+    print Mov_avg
+
+
+def crosscorrelation():
+    global sum
+    fname2 = askopenfilename()
+    Signal1 = Signal_Info(fname2)
+    signal1 = [i[1] for i in Signal1]
+    x = [i[0] for i in Signal1]
+    fname3 = askopenfilename()
+
+    Signal3 = Signal_Info(fname3)
+
+    signal2 = [i[1] for i in Signal3]
+    x2 = [i[0] for i in Signal3]
+    # print (signal1 , signal2)
+    if (len(signal1) != len(signal2)):
+        n = (len(signal1) + len(signal2)) - 1
+        for i in range(n - len(signal1)):
+            signal1 = np.append(signal1, 0)
+        for i in range(n - len(signal2)):
+            signal2 = np.append(signal2, 0)
+
+    n = len(signal1)
+    if (norm_check == 1):
+        sumvar1 = 0
+        sumvar2 = 0
+        for i in range(n):
+            temp = signal1[i] * signal1[i]
+            sumvar1 += temp
+            temp = signal2[i] * signal2[i]
+            sumvar2 += temp
+            sumvar1 = math.sqrt(sumvar1 * sumvar2)
+            sumvar1 /= n
+            sum = np.zeros([n, 2])
+    res = 0
+    for i in range(n):
+        res = 0
+        for j in range(n):
+            res += signal1[j] * signal2[j]
+        if (per_check == 1):
+            signal2 = np.roll(signal2, -1)
+        else:
+            signal2 = np.delete(signal2, 0)
+            signal2 = np.append(signal2, 0)
+        res /= n
+        if (norm_check == 1):
+            res /= sumvar1
+
+        sum.append(res)
+    np.savetxt('CorrelationResult.ds', sum, fmt='%5s')
+    print (sum)
+    # print (sumy)
+
+
+def Get_Values():
+    global A, N, F, Fs, phase_shift
+    A = int(ent2.get())
+    N = int(ent3.get())
+    F = int(ent4.get())
+    Fs = int(ent5.get())
+    phase_shift = int(ent6.get())
+
+
+def Generate_signal_Cos():
+    x = []
+    y = []
+    Get_Values()
+    for i in range(N):
+        x.append(i)
+        Xn = round(A * (math.cos(2 * math.pi * F / Fs * i + phase_shift)), 4)
+        y.append(Xn)
+    print y
+    plt.plot(x, y, 'bo', color='red', markersize=3)
+    # plt.plot(x, y)
+    plt.show()
+
+
+def Generate_signal_Sin():
+    x = []
+    y = []
+    Get_Values()
+    for i in range(N):
+        x.append(i)
+        Xn = round(A * (math.sin(2 * math.pi * F / Fs * i + phase_shift)), 4)
+        y.append(Xn)
+    print y
+    plt.plot(x, y, 'bo', color='blue', markersize=3)
+    # plt.plot(x, y)
+    plt.show()
+
+
+def FFT(x):
+    n = len(x)
+
+    if n == 2:
+        return [x[0] + x[1], x[0] - x[1]]
+
+    fft_1 = FFT(x[::2])
+    fft_2 = FFT(x[1::2])
+
+    res = [0 for i in range(n)]
+    for k in range(n / 2):
+        w = np.complex(math.cos(-2 * k * np.pi / n), math.sin(-2 * k * np.pi / n))
+        res[k] = fft_1[k] + w * fft_2[k]
+        res[k + n / 2] = fft_1[k] - w * fft_2[k]
+
+    return res
+
+
+def DFT():
+    fs = float(ent0.get())
+    fs = float(fs)
+    fname2 = askopenfilename()
+
+    Signal1 = Signal_Info(fname2)
+    Xind = [i[0] for i in Signal1]
+    Yval = [i[1] for i in Signal1]
+
+    # print Yval
+    N = len(Yval)
+    # print N
+
+    FmList = FFT(Yval)
+
+    # for k in range(N):
+    #     Fm = 0.0
+    #     for n in range(N):
+    #         Fm += Yval[n] * cmath.exp(- 1j * (pi2 * k * n) / N)
+    #     FmList.append(Fm)
+
+    # print FmList
+
+    r = []
+    im = []
+    for i in range(len(FmList)):
+        x = FmList[i]
+        # print x.real
+        # print x.imag
+        # x = abs(FmList[i])
+        r.append(x.real)
+        im.append(x.imag)
+    # print r
+    # print im
+
+    ambl = []
+    for i in range(len(FmList)):
+        x = FmList[i]
+        x = abs(FmList[i])
+        ambl.append(x)
+    print ambl
+
+    phasel = []
+    for i in range(len(FmList)):
+        x = FmList[i]
+        y = float((180 * math.radians(math.atan2(x.imag, x.real))) / cmath.pi)
+        phasel.append(y)
+    print "phase : ", phasel
+
+    with open('Dft', 'w') as f:
+        f.write("{}\n".format('1'))
+        f.write("{}\n".format('0'))
+        f.write("{}\n".format(N))
+        writer = csv.writer(f, delimiter=' ')
+        writer.writerows(zip(mm, ambl, phasel))
+
+    alfa = float(pi2 / (N * float(1 / fs)))
+    lalfa = []
+    for i in range(N):
+        lalfa.append(alfa + (alfa * i))
+    # print  lalfa
+
+    plt.figure(1)
+    # plt.subplot(211)
+    plt.scatter(lalfa, ambl)
+    plt.xlabel('Frequency')
+    plt.ylabel('Amplitude')
+    # plt.show()
+
+    plt.figure(2)
+    # plt.subplot(212)
+    plt.scatter(lalfa, phasel)
+    plt.xlabel('Frequency')
+    plt.ylabel('Phase shift')
+    plt.show()
+
+
+def IDFT():
+    fname2 = askopenfilename()
+    with open(fname2, "r") as f:
+        for i, line in enumerate(f):
+            if (i > 2):
+                line = line.strip()
+                sline = line.split(' ')
+                m111.append(sline)
+                m0.append(int(m111[i - 3][0]))
+                m1.append(float(m111[i - 3][1]))
+                m2.append(float(m111[i - 3][2]))
+    m22 = []
+    for n in range(len(m2)):
+        h = round(math.degrees(m2[n]), 2)
+        m22.append(h)
+    # print m22
+
+    df = []
+    for i in range(len(m1)):
+        r = m1[i] * math.cos(m2[i])
+        x1.append(r)
+        im = m1[i] * math.sin(m2[i])
+        y1.append(im)
+        # complex = np.complex(r, im)
+        # df.append(complex)
+    # print df
+    # print fl
+    # print x1
+    # print y1
+
+    N = len(x1)
+    fnList = []
+    for n in range(len(x1)):
+        fx = 0.0
+        fy = 0.0
+        for m in range(N):
+            Pow = (m * pi2 * n) / N
+            # fx += float(x1[m]) * cmath.exp(1j * (pi2 * m * n) / N)
+            # fy += float(y1[m]) * cmath.exp(1j * pi2 * m * n / N)
+            fx += float(x1[m]) * float(math.cos(Pow))
+            fy += float(y1[m]) * float(math.sin(Pow))
+            roun = round((fx - fy) / N, 2)
+        fnList.append(roun)
+    print fnList
+
+    with open('Idft', 'w') as f:
+        f.write("{}\n".format('0'))
+        f.write("{}\n".format('0'))
+        f.write("{}\n".format(N))
+        writer = csv.writer(f, delimiter=' ')
+        writer.writerows(zip(m0, fnList))
+
+
+def clear():
+    ent2.delete(0, END)
+    ent3.delete(0, END)
+    ent4.delete(0, END)
+    ent5.delete(0, END)
+    ent6.delete(0, END)
+
+
+root = Tk()
+
+root.title("Signal")
+root.configure(background="gray")
+Mylabel = Label(root, text="Signal`s Task!!", bg="gray", font="arial", fg="black")
+Mylabel.pack()
+Mylabel.place(x=1050, y=10)
+root.geometry("1200x600+90+50")
+
+Name_Of_label = Label(root, text="Enter Your Constant", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=183, y=122)
+
+ent = Entry(root)
+ent.pack()
+ent.place(x=180, y=142)
+ent.get()
+
+Name_Of_label = Label(root, text="Enter Your Kernal", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=190, y=180)
+
+Name_Of_label = Label(root, text="---------T---------", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=190, y=240)
+
+ent0 = Entry(root)
+ent0.pack()
+ent0.place(x=180, y=260)
+ent0.get()
+
+ent1 = Entry(root)
+ent1.pack()
+ent1.place(x=180, y=200)
+ent1.get()
+
+############Generate Signal##################
+Name_Of_label = Label(root, text="Ampiltude", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=730, y=50)
+
+ent2 = Entry(root)
+ent2.pack()
+ent2.place(x=700, y=70)
+ent2.get()
+
+Name_Of_label = Label(root, text="Number of sampling", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=530, y=130)
+
+ent3 = Entry(root)
+ent3.pack()
+ent3.place(x=530, y=150)
+ent3.get()
+
+Name_Of_label = Label(root, text="Analoge freuency", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=886, y=130)
+
+ent4 = Entry(root)
+ent4.pack()
+ent4.place(x=880, y=150)
+ent4.get()
+
+Name_Of_label = Label(root, text="Sampling frequency", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=600, y=280)
+
+ent5 = Entry(root)
+ent5.pack()
+ent5.place(x=600, y=300)
+ent5.get()
+
+Name_Of_label = Label(root, text="Phase shift", bg="gray", fg="black")
+Name_Of_label.pack()
+Name_Of_label.place(x=827, y=280)
+
+ent6 = Entry(root)
+ent6.pack()
+ent6.place(x=800, y=300)
+ent6.get()
+
+###############################
+
+
+
+
+
+
+
+
+
+var_chk = IntVar()
+radio1 = Radiobutton(root, text="Signal1", variable=var_chk, value=1, fg="black", bg="gray")
+radio1.pack()
+radio1.place(x=40, y=100)
+
+radio2 = Radiobutton(root, text="Signal2", variable=var_chk, value=2, fg="black", bg="gray")
+radio2.pack()
+radio2.place(x=115, y=100)
+
+button1 = Button(root, text="Browes1", width=15, bg="gray", fg="black", command=Browes1)
+button1.pack(side="left", padx=5, pady=5)
+button1.place(x=10, y=10)
+
+button2 = Button(root, text="Add", width=15, bg="gray", fg="black", command=Add)
+button2.pack(side="left", padx=5, pady=5)
+button2.place(x=140, y=10)
+
+button3 = Button(root, text="Sub", width=15, bg="gray", fg="black", command=Sub)
+button3.pack(side="left", padx=5, pady=5)
+button3.place(x=270, y=10)
+
+button4 = Button(root, text="Mul", width=15, bg="gray", fg="black", command=Mul_Constant)
+button4.pack(side="left", padx=5, pady=5)
+button4.place(x=50, y=140)
+
+button5 = Button(root, text="Exit", width=15, bg="gray", fg="black", command=Exit)
+button5.pack(side="left", padx=5, pady=5)
+button5.place(x=400, y=10)
+
+button6 = Button(root, text="Remove_DC_Component", width=20, bg="gray", fg="black", command=Remove_DC_Component)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=530, y=10)
+
+button6 = Button(root, text="Sharpen", width=15, bg="gray", fg="black", command=Sharpen)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=700, y=10)
+
+button6 = Button(root, text="Moving_avg", width=15, bg="gray", fg="black", command=Moving_avg1)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=50, y=200)
+
+button6 = Button(root, text="DFT", width=15, bg="orange", fg="black", command=DFT)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=50, y=258)
+
+button6 = Button(root, text="IDFT", width=15, bg="orange", fg="black", command=IDFT)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=50, y=310)
+
+button6 = Button(root, text="Cos", width=10, bg="gray", fg="black", command=Generate_signal_Cos)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=680, y=190)
+
+button6 = Button(root, text="Sin", width=10, bg="gray", fg="black", command=Generate_signal_Sin)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=770, y=190)
+
+button6 = Button(root, text="Clear", width=10, bg="gray", fg="black", command=clear)
+button6.pack(side="left", padx=5, pady=5)
+button6.place(x=770, y=550)
+
+var_chk2 = IntVar()
+radio3 = Radiobutton(root, text="[0,1]", variable=var_chk2, value=1, fg="black", bg="gray")
+radio3.pack()
+radio3.place(x=40, y=400)
+
+radio4 = Radiobutton(root, text="[-1,1]", variable=var_chk2, value=2, fg="black", bg="gray")
+radio4.pack()
+radio4.place(x=115, y=400)
+
+norm_check = IntVar()
+radio5 = Radiobutton(root, text="Normalized", variable=norm_check, value=1, fg="black", bg="gray")
+radio5.pack()
+radio5.place(x=230, y=550)
+
+button7 = Button(root, text="Normalize", width=15, bg="gray", fg="black", command=normalize1)
+button7.pack(side="left", padx=5, pady=5)
+button7.place(x=50, y=450)
+button8 = Button(root, text="Auto Correlation", width=15, bg="gray", fg="black", command=autocorrelation)
+button8.pack(side="left", padx=5, pady=5)
+button8.place(x=70, y=550)
+button9 = Button(root, text="Convolve", width=15, bg="gray", fg="black", command=convolution)
+button9.pack(side="left", padx=5, pady=5)
+button9.place(x=350, y=550)
+# Fold()
+per_check = IntVar()
+radio5 = Radiobutton(root, text="Periodic", variable=per_check, value=1, fg="black", bg="gray")
+radio5.pack()
+radio5.place(x=1120, y=100)
+
+button10 = Button(root, text="Cross Correlation", width=15, bg="gray", fg="black", command=crosscorrelation)
+button10.pack(side="left", padx=5, pady=5)
+button10.place(x=920, y=100)
+root.mainloop()
